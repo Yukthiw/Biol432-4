@@ -1,0 +1,68 @@
+---
+title: "Analysis"
+author: "Yukthi"
+date: "04/02/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Analysis of DNA Base Content in Samples of Borrelia burgdorferi
+![Borrelia burgdorferi](\Users\yukth\Documents\BIOL432\Rentrez\bacteria.jpg)
+
+In this assignment I pulled DNA sequences for the 16s gene of Borrelia burgdorferi. Using the entrez_fetch functio from the rentrez library, I extracted the ID and sequence of 3 Borrelia burgdorferi gene sequences. Using several Regex functions I then found the frequencies of each base in each sequence and made a table of each respective frequency, as well as the GC content of each sample. Finally by reading the GC_content.csv file into a dataframe I calculated the GC content of 1000 different samples from 3 different species and compared the GC content of each using a scatter plot.
+
+## Imports
+Imported knitr and ggplot2 to make tables and scatter plot. Also read Sequences.csv (made in Download.R script) and GC_content.csv into respective dataframes.
+```{r imports}
+library(knitr)
+library(ggplot2)
+seqs = read.csv("Sequences.csv")
+gc = read.csv("GC_content.csv")
+```
+
+
+## Data Analysis
+Made a function called basecount which took a string and outputted the number of each regex search character. I used this function to make 4 columns in the seqs dataframe which contained the number of each respective base in each sequence. I then calculated the GC Content of each sequence and entered that in a new column called GC_Content.
+
+
+```{r nucleotides}
+
+baseCount = function(xVec,match){
+  return (lengths(regmatches(xVec, gregexpr(match, xVec))))
+}
+
+basePairs = matrix(nrow=3,ncol=4)
+for (i in 1:3){
+    seqs[i,'A Count'] = baseCount(seqs[i,'Sequence'],'A')
+    seqs[i,'T Count'] = baseCount(seqs[i,'Sequence'],'T')
+    seqs[i,'G Count'] = baseCount(seqs[i,'Sequence'],'G')
+    seqs[i,'C Count'] = baseCount(seqs[i,'Sequence'],'C')
+}
+
+seqs[,'GC_Content'] = paste(round((seqs[,'G Count']+seqs[,'C Count'])/(seqs[,'G Count']+seqs[,'C Count']+seqs[,'A Count']+seqs[,'T Count'])*100,digits=2),'%')
+
+seqs['Sequence_ID']=c('HQ433692.1','HQ433694.1','HQ433691.1')
+
+gc[,'GC_Content'] = gc[,'G']+gc[,'C']
+
+seqs
+```
+
+## Outputs
+
+I printed the sequences of each sequence in the seqs dataframe, and then made two tables, one containing the number of each respective base and one containing the GC content of each sequence.
+
+I then plotted a scatter plot using the data from the gc dataframe. I compared the G content by the C content of each sequence and then colour coded each point by species, while also making the size of each point porportional to the GC content of each sequence.
+
+```{r outputs}
+print(seqs[,'Sequence'])
+kable(seqs[,c('Sequence_ID','A Count','T Count','G Count','C Count')])
+
+kable(seqs[,c('Sequence_ID','GC_Content')])
+
+ggplot(gc,aes(x=G,y=C,color=Species,size=GC_Content))+geom_point()+labs(x="Guanine Content",y="Cytosine Content")
+```
+
