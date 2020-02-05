@@ -48,7 +48,6 @@ seqs['Sequence_ID']=c('HQ433692.1','HQ433694.1','HQ433691.1')
 
 gc[,'GC_Content'] = gc[,'G']+gc[,'C']
 
-seqs
 ```
 
 ## Outputs
@@ -58,7 +57,7 @@ I printed the sequences of each sequence in the seqs dataframe, and then made tw
 I then plotted a scatter plot using the data from the gc dataframe. I compared the G content by the C content of each sequence and then colour coded each point by species, while also making the size of each point porportional to the GC content of each sequence.
 
 ```{r outputs}
-print(seqs[,'Sequence'])
+print(as.character(seqs[,'Sequence']))
 kable(seqs[,c('Sequence_ID','A Count','T Count','G Count','C Count')])
 
 kable(seqs[,c('Sequence_ID','GC_Content')])
